@@ -6,34 +6,22 @@ object day4 {
         fun unmarked(marked: List<Int>): List<Int> = rows.fold(emptyList()) { acc, line -> acc + line.filter { number -> !marked.contains(number) } }
     }
 
-    tailrec fun playBingo(boards: List<Board>, numbers: List<Int>, marked: List<Int> = emptyList()): Int {
-        return if (boards.any { it.hasBingo(marked) })
-            boards.first { it.hasBingo(marked) }.unmarked(marked).sum() * marked.last()
-        else playBingo(boards, numbers.drop(1), marked + numbers.first())
-    }
-
-    tailrec fun playBingoUntilLast(boards: List<Board>, numbers: List<Int>, marked: List<Int> = emptyList()): Int {
-        return if (boards.size == 1 && boards.first().hasBingo(marked)) boards.first().unmarked(marked).sum() * marked.last()
-        else playBingoUntilLast(boards.filter { !it.hasBingo(marked) }, numbers.drop(1), marked + numbers.first())
-    }
-
     fun parseBoards(input: List<String>): List<Board> = input.drop(1).chunked(6).map { chunk ->
         Board(chunk.drop(1).map { line ->
             line.trim().split("""\s+""".toRegex()).map { number -> number.toInt() }
         } )
     }
 
-    fun pt1(input: List<String>): Int {
-        val numbers = input.first().split(",").map { it.toInt() }
-        val boards = parseBoards(input)
-        return playBingo(boards, numbers)
+    fun parseNumbers(input: List<String>): List<Int> = input.first().split(",").map { it.toInt() }
+
+    tailrec fun playBingo(boards: List<Board>, numbers: List<Int>, marked: List<Int> = emptyList(), winCondition: (List<Board>, List<Int>) -> Boolean): Int {
+        return if (winCondition(boards, marked)) boards.first { it.hasBingo(marked) }.unmarked(marked).sum() * marked.last()
+        else playBingo(boards.filter { !it.hasBingo(marked) }, numbers.drop(1), marked + numbers.first(), winCondition)
     }
 
-    fun pt2(input: List<String>): Int {
-        val numbers = input.first().split(",").map { it.toInt() }
-        val boards = parseBoards(input)
-        return playBingoUntilLast(boards, numbers)
-    }
+    fun pt1(input: List<String>): Int =
+        playBingo(parseBoards(input), parseNumbers(input)) { boards, marked -> boards.any { it.hasBingo(marked) }}
 
-
+    fun pt2(input: List<String>): Int =
+        playBingo(parseBoards(input), parseNumbers(input)) { boards, marked -> boards.size == 1 && boards.first().hasBingo(marked)}
 }
