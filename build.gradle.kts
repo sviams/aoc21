@@ -20,6 +20,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.4")
     testImplementation("org.spekframework.spek2:spek-dsl-jvm:$spek_version")
     testImplementation("org.amshove.kluent:kluent:$kluent_version")
     testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:$spek_version")
