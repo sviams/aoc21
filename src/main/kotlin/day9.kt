@@ -2,23 +2,14 @@ object day9 {
 
     val CARTESIANS = listOf(Pos.EAST, Pos.WEST, Pos.NORTH, Pos.SOUTH)
 
-    tailrec fun findLowSpots(spots: List<List<Int>>, result: List<Pos> = emptyList(), row: Int = 0, col: Int = 0): List<Pos> {
-        val width = spots.first().size
-        val height = spots.size
-        if (row == height-1 && col == width-1) return result
+    fun neighbors(to: Pos, width: Int, height: Int): List<Pos> = CARTESIANS.map { Pos(to.x+it.x, to.y+it.y) }.filter { it.y in 0 until height && it.x in 0 until width }
 
-        val neighbors = CARTESIANS.map { row+it.y to col+it.x }
-            .filter { it.first in 0 until height && it.second >= 0 && it.second < width }
-            .map { spots[it.first][it.second] }
+    fun allPos(spots: List<List<Int>>): List<Pos> = spots.indices.flatMap { y -> spots.first().indices.map { x -> Pos(x,y) } }
 
-        val newResult = if (spots[row][col] < neighbors.minOrNull()!!) result + Pos(col, row) else result
-        val newCol = if (col == width -1) 0 else col + 1
-        val newRow = if (newCol == 0) row + 1 else row
-        return findLowSpots(spots, newResult, newRow, newCol)
-    }
+    fun findLowSpots(spots: List<List<Int>>): List<Pos> = allPos(spots).filter { spot -> neighbors(spot, spots.first().size, spots.size).all { n -> spots[n.y][n.x] > spots[spot.y][spot.x] } }
 
     fun calcBasin(spots: List<List<Int>>, toCheck: Pos, checked: List<Pos>, width: Int, height: Int): List<Pos> {
-        val neighborsToCheck = CARTESIANS.map { Pos(toCheck.x+it.x,toCheck.y+it.y) }.filter { it.y in 0 until height && it.x in 0 until width && !checked.contains(it) && spots[it.y][it.x] != 9 }
+        val neighborsToCheck = neighbors(toCheck, width, height).filter { !checked.contains(it) && spots[it.y][it.x] != 9 }
         return neighborsToCheck.fold(listOf(toCheck)) { acc, pos -> acc.plus(calcBasin(spots, pos, (checked + neighborsToCheck + acc), width, height)) }
     }
 
