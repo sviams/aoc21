@@ -22,3 +22,12 @@ data class Pos(val x: Int, val y: Int) {
         val EAST = Pos(1, 0)
     }
 }
+
+fun <T> Sequence<T>.takeWhileInclusive(pred: (T) -> Boolean): Sequence<T> {
+    var shouldContinue = true
+    return takeWhile {
+        val result = shouldContinue
+        shouldContinue = pred(it)
+        result
+    }
+}
