@@ -32,7 +32,8 @@ object day14 {
         val characterFrequencies = endPairs.entries.fold(persistentMapOf<Char, Long>()) { acc, (pair, count) ->
             acc.put(pair.first(), acc.getOrDefault(pair.first(), 0L) + count)
         }
-        return characterFrequencies.maxOf { it.value } - characterFrequencies.minOf { it.value } + 1
+        val adjustedForEnd = characterFrequencies.put(polymer.last(), characterFrequencies[polymer.last()]!!+1)
+        return adjustedForEnd.maxOf { it.value } - adjustedForEnd.minOf { it.value }
     }
 
     fun pt1(input: List<String>): Long = solve(input, 10)
