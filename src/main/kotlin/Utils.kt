@@ -34,6 +34,15 @@ fun <T> Sequence<T>.takeWhileInclusive(pred: (T) -> Boolean): Sequence<T> {
     }
 }
 
+fun <T> List<T>.takeWhileInclusive(pred: (T) -> Boolean): List<T> {
+    var shouldContinue = true
+    return takeWhile {
+        val result = shouldContinue
+        shouldContinue = pred(it)
+        result
+    }
+}
+
 typealias Path = PersistentList<Pos>
 
 data class Quad<out A, out B, out C, out D>(
