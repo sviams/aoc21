@@ -51,8 +51,7 @@ object day16 {
 
         companion object {
             fun fromHex(hex: String): Packet = Packet(hex.map {
-                val unpadded = it.digitToInt(16).toString(2)
-                generateSequence { "0" }.take(4-unpadded.length).joinToString("") + unpadded
+                it.digitToInt(16).toString(2).padStart(4, '0')
             }.joinToString(""))
         }
     }
