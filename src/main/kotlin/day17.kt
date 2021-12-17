@@ -19,14 +19,12 @@ object day17 {
         else calculateTrajectory(if (dx == 0) 0 else dx - 1, dy-1, bottom, result.add(Pos(last.x + dx, last.y + dy)))
     }
 
-    tailrec fun hitsForX(target: TargetBox, dx: Int, dy: Int = target.yRange.first, result: PersistentList<Pos> = persistentListOf()): PersistentList<Pos> {
-        return if (dy > abs(target.yRange.first)) result
-        else hitsForX(target, dx, dy + 1, if (target.contains(calculateTrajectory(dx, dy, target.yRange.first))) result.add(Pos(dx, dy)) else result)
-    }
-
-    tailrec fun trajectoriesThatHit(target: TargetBox, dx: Int = 0, result: PersistentList<Pos> = persistentListOf()): PersistentList<Pos> {
-        return if (dx > target.xRange.last) result else trajectoriesThatHit(target, dx + 1, result.addAll(hitsForX(target, dx)))
-    }
+    fun trajectoriesThatHit(target: TargetBox): PersistentList<Pos> =
+        (0 .. target.xRange.last).fold(persistentListOf()) { hits, dx ->
+            hits.addAll((target.yRange.first .. abs(target.yRange.first)).fold(persistentListOf()) { acc, dy ->
+                if (target.contains(calculateTrajectory(dx, dy, target.yRange.first))) acc.add(Pos(dx, dy)) else acc
+            })
+        }
 
     fun pt1(input: String): Int {
         val target = parseInput(input)
@@ -35,6 +33,6 @@ object day17 {
         val best = hits.filter { it.y == maxY }.first()
         return calculateTrajectory(best.x, best.y, target.yRange.first).maxOf { it.y }
     }
-
+    
     fun pt2(input: String): Int = trajectoriesThatHit(parseInput(input)).size
 }
