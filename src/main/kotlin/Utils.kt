@@ -25,6 +25,56 @@ data class Pos(val x: Int, val y: Int) {
     }
 }
 
+data class Pos3D(val x: Int, val y: Int, val z: Int) {
+    operator fun plus(other: Pos3D) = Pos3D(x + other.x, y + other.y, z + other.z)
+    operator fun minus(other: Pos3D) = Pos3D(x - other.x, y - other.y, z - other.z)
+    operator fun times(other: Pos3D) = Pos3D(x * other.x, y * other.y, z * other.z)
+    fun distanceTo(other: Pos3D) = abs(x - other.x) + abs(y - other.y) + abs(z - other.z)
+    fun roll(): Pos3D = Pos3D(x, z, -y)
+    fun turn(): Pos3D = Pos3D(-y,x,z)
+
+    override fun equals(other: Any?): Boolean {
+        val o = other as Pos3D
+        return x == o.x && y == o.y && z == o.z
+    }
+
+    override fun toString(): String = "$x,$y,$z"
+
+    companion object {
+        fun rotations(): List<(Pos3D) -> Pos3D> = listOf(
+            { p -> Pos3D(p.x,   p.y,    p.z) },
+            { p -> Pos3D(p.x,   -p.y,   -p.z)},
+            { p -> Pos3D(p.x,   -p.z,   p.y) },
+            { p -> Pos3D(p.x,   p.z,    -p.y)},
+
+            { p -> Pos3D(-p.x,  p.y,    -p.z)},
+            { p -> Pos3D(-p.x,  -p.y,   p.z)},
+            { p -> Pos3D(-p.x,  -p.z,   -p.y)},
+            { p -> Pos3D(-p.x,  p.z,    p.y)},
+
+            { p -> Pos3D(p.y,   p.z,    p.x)},
+            { p -> Pos3D(p.y,   -p.z,   -p.x)},
+            { p -> Pos3D(p.y,   p.x,    -p.z)},
+            { p -> Pos3D(p.y,   -p.x,   p.z)},
+
+            { p -> Pos3D(-p.y,  p.z,    -p.x)},
+            { p -> Pos3D(-p.y,  -p.z,   p.x)},
+            { p -> Pos3D(-p.y,  p.x,    p.z)},
+            { p -> Pos3D(-p.y,  -p.x,   -p.z)},
+
+            { p -> Pos3D(p.z,   p.x,    p.y)},
+            { p -> Pos3D(p.z,   -p.x,   -p.y)},
+            { p -> Pos3D(p.z,   -p.y,   p.x)},
+            { p -> Pos3D(p.z,   p.y,    -p.x)},
+
+            { p -> Pos3D(-p.z,  -p.y,   -p.x)},
+            { p -> Pos3D(-p.z,  p.y,    p.x)},
+            { p -> Pos3D(-p.z,  p.x,    -p.y)},
+            { p -> Pos3D(-p.z,  -p.x,   p.y)}
+        )
+    }
+}
+
 fun <T> Sequence<T>.takeWhileInclusive(pred: (T) -> Boolean): Sequence<T> {
     var shouldContinue = true
     return takeWhile {
